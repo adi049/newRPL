@@ -1,0 +1,59 @@
+/* ============================================================
+   RPL DIAGNOSTIC — DESIGN TOKENS
+   Signature: the "Report Card" — health packages rendered as
+   authentic diagnostic report printouts (perforated edge,
+   mono test-count, verified-price stamp) because the pricing
+   itself was sourced from the client's real lab rate card.
+   ============================================================ */
+
+:root{
+  /* ---- Color: white/blue primary, logo green accent ---- */
+  --white:      #ffffff;
+  --paper:      #f5f9fb;
+  --paper-2:    #eef4f7;
+  --ink:        #0d2233;
+  --ink-soft:   #33495a;
+  --muted:      #5c7686;
+  --line:       #dce7ec;
+  --line-soft:  #e9f0f3;
+
+  --navy-900:   #082438;
+  --navy-800:   #0c3652;
+  --navy-700:   #0f4a6d;
+  --navy-600:   #14618c;
+  --navy-500:   #1c7bab;
+  --sky-100:    #eaf4fa;
+  --sky-50:     #f4f9fc;
+
+  --green-700:  #106b3f;
+  --green-600:  #158a4f;
+  --green-500:  #1ea361;
+  --green-100:  #e1f5e9;
+
+  --gold:       #c99a3f; /* rating stars only */
+
+  /* ---- Type ---- */
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body:    'Inter', -apple-system, sans-serif;
+  --font-mono:    'IBM Plex Mono', ui-monospace, monospace;
+
+  /* ---- Radius / Shadow ---- */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+
+  --shadow-sm: 0 2px 8px rgba(13,34,51,.06);
+  --shadow-md: 0 8px 30px rgba(13,34,51,.09);
+  --shadow-lg: 0 20px 60px rgba(13,34,51,.14);
+  --shadow-navy: 0 16px 40px rgba(15,74,109,.28);
+  --shadow-green: 0 12px 30px rgba(21,138,79,.25);
+
+  /* ---- Layout ---- */
+  --container: 1240px;
+  --pad: clamp(20px, 5vw, 64px);
+}
+
+@media (prefers-color-scheme: dark){
+  :root{ /* site is intentionally light/premium; no dark mode override needed */ }
+}
