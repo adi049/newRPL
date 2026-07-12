@@ -142,15 +142,45 @@ if (window.gsap) {
 }
 
 // ============ CONTACT FORM (client-side only) ============
-const form = document.getElementById('bookingForm');
-const note = document.getElementById('formNote');
-form?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const name = document.getElementById('fname').value.trim();
-  note.textContent = name
-    ? `Thanks, ${name}! Please call 9811561712 or WhatsApp us to confirm your slot — our team will also try reaching you shortly.`
-    : "Thanks! Please call 9811561712 or WhatsApp us to confirm your slot.";
-  note.style.color = '#158a4f';
-  note.style.fontWeight = '600';
-  form.reset();
+// ============ WHATSAPP BOOKING ============
+const form = document.getElementById("bookingForm");
+const note = document.getElementById("formNote");
+
+form?.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("fname").value;
+    const phone = document.getElementById("fphone").value;
+    const packageName = document.getElementById("fpackage").value;
+    const mode = document.getElementById("fmode").value;
+    const message = document.getElementById("fmsg").value;
+
+    const whatsappMessage =
+`Hello RPL Diagnostic,
+
+I would like to book an appointment.
+
+👤 Name: ${name}
+📞 Phone: ${phone}
+
+🧪 Test/Package:
+${packageName}
+
+🏠 Preferred Mode:
+${mode}
+
+📝 Message:
+${message}
+
+Please confirm my appointment.`;
+
+    const whatsappURL =
+`https://wa.me/919811561712?text=${encodeURIComponent(whatsappMessage)}`;
+
+    window.open(whatsappURL, "_blank");
+
+    note.innerHTML = "Redirecting to WhatsApp...";
+    note.style.color = "green";
+
+    form.reset();
 });
