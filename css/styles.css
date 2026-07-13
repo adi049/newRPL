@@ -300,8 +300,35 @@ section{ position:relative; }
   .hero__grid{ grid-template-columns:1fr; }
   .hero__panel{ height:400px; margin-top:20px; }
   .nav__links, .nav__phone{ display:none; }
-  .nav__burger{ display:flex; }
+  .nav__burger{ display:flex; flex-shrink:0; }
+  .nav__right{ gap:8px; }
+  .nav__links{ display:none; }
+  .nav__inner{ gap:12px; }
+  .hero__copy{ text-align:center; }
+  .hero__actions, .hero__trust{ justify-content:center; }
+  .hero__sub{ margin-inline:auto; }
+  .nav__phone{
+    width:40px; height:40px;
+    padding:0;
+    justify-content:center;
+    background:var(--sky-100);
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .nav__phone svg{ width:18px; height:18px; }
+  .nav__phone-label{ display:none; }
+
+  .nav__book-btn{
+     width:40px; height:40px;
+    padding:0;
+    justify-content:center;
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .nav__book-btn svg{ width:18px; height:18px; }
+  .nav__book-btn-label{ display:none; }
 }
+
 
 /* ============ STATS STRIP ============ */
 .stats-strip{
@@ -728,3 +755,44 @@ section{ position:relative; }
 /* utility */
 .text-center{ text-align:center; }
 .mt-40{ margin-top:40px; }
+/* ============ MOBILE FIXES: 600px and below ============ */
+@media (max-width: 600px){
+  /* Hero floating cards: stop absolute-positioning overlap, stack in normal flow.
+     GSAP's float/entrance animations still run — they just animate a static-flow element now. */
+  .hero__panel{
+    position:static;
+    height:auto;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    margin-top:32px;
+  }
+  .float-card{ position:static; width:100%; }
+
+  /* Negative-offset badge was poking past the viewport edge on narrow screens */
+  .about__media{ margin-bottom:26px; } /* keep space now that badge no longer floats out below */
+  .about__badge{ left:12px; bottom:-20px; }
+
+  .about__media img{ height:280px; }
+  .team-card img{ height:260px; }
+}
+
+/* ============ MOBILE FIXES: 480px and below ============ */
+@media (max-width: 480px){
+  /* Hero: allow heading to scale further, kill leftover max-width clipping risk */
+  .hero__title{ font-size:clamp(1.9rem, 8vw, 2.6rem); max-width:100%; }
+  .hero__sub{ font-size:1rem; max-width:100%; }
+
+  /* Buttons stack cleanly instead of wrapping awkwardly side-by-side */
+  .hero__actions{ flex-direction:column; align-items:stretch; }
+  .hero__actions .btn{ width:100%; }
+
+  /* Prevent long button labels from being clipped by .btn's overflow:hidden */
+  .btn-block{ white-space:normal; text-align:center; }
+  .contact__form{ padding:24px 20px; }
+  .btn{ padding:14px 18px; font-size:.88rem; }
+
+  /* Final 1-column step for grids that stopped at 2/3 columns */
+  .services__grid{ grid-template-columns:1fr; }
+  .features-strip__grid{ grid-template-columns:1fr; }
+}
