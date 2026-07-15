@@ -1,5 +1,8 @@
 // ============ FOOTER YEAR ============
-document.getElementById('year').textContent = new Date().getFullYear();
+const year = document.getElementById("year");
+if (year) {
+  year.textContent = new Date().getFullYear();
+}
 
 // ============ LENIS SMOOTH SCROLL ============
 let lenis;
@@ -48,11 +51,20 @@ window.addEventListener('scroll', onScroll);
 onScroll();
 
 // ============ MOBILE DRAWER ============
-const burger = document.getElementById('burgerBtn');
-const drawer = document.getElementById('mobileDrawer');
-const drawerClose = document.getElementById('drawerCloseBtn');
-burger?.addEventListener('click', () => drawer.classList.add('open'));
-drawerClose?.addEventListener('click', () => drawer.classList.remove('open'));
+
+const burger = document.getElementById("burgerBtn");
+const drawer = document.getElementById("mobileDrawer");
+const drawerClose = document.getElementById("drawerCloseBtn");
+
+burger?.addEventListener("click", () => {
+    drawer.classList.add("open");
+    burger.setAttribute("aria-expanded", "true");
+});
+
+drawerClose?.addEventListener("click", () => {
+    drawer.classList.remove("open");
+    burger.setAttribute("aria-expanded", "false");
+});
 
 // ============ SCROLL REVEAL ============
 const revealEls = document.querySelectorAll('[data-reveal]');
