@@ -205,10 +205,22 @@ section{ position:relative; }
 .mobile-drawer__close{ width:40px; height:40px; border-radius:50%; background:var(--sky-100); border:none; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .mobile-drawer a{ font-family:var(--font-display); font-size:1.5rem; padding:14px 0; border-bottom:1px solid var(--line-soft); color:var(--navy-900); font-weight:500; }
 
+/* ============ MOBILE DRAWER OVERLAY (backdrop) ============ */
+.mobile-drawer__overlay{
+  position:fixed; inset:0; z-index:1090;
+  background:rgba(8,36,56,.45);
+  opacity:0; pointer-events:none;
+  transition:opacity .35s ease;
+}
+.mobile-drawer__overlay.open{ opacity:1; pointer-events:auto; }
+
+/* lock background scroll while the drawer is open */
+body.drawer-open{ overflow:hidden; }
+
 /* ============ HERO ============ */
 .hero{
   position:relative;
-  min-height:100vh;
+  min-height:calc(var(--vh, 1vh) * 100);
   display:flex; align-items:center;
   padding-top:120px;
   padding-bottom:60px;

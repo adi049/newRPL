@@ -1,3 +1,18 @@
+// ============ MOBILE VIEWPORT HEIGHT FIX ============
+// Mobile browsers change the visible viewport height when the address bar
+// shows/hides on scroll. `.hero{ min-height:100vh }` reacts to that and
+// causes the whole layout (including the fixed navbar) to jump/reflow,
+// which is why the navbar can appear to "disappear" on real phones even
+// though it looks fine on desktop / devtools device emulation.
+// We set a stable --vh custom property instead and only recompute it on
+// real size changes (orientation change / actual resize), not on every
+// address-bar show/hide.
+function setVH() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+setVH();
+
 // ============ FOOTER YEAR ============
 const year = document.getElementById("year");
 if (year) {
@@ -10,8 +25,10 @@ if (window.Lenis) {
   lenis = new Lenis({
     duration: 1.1,
     smoothWheel: true,
+    smoothTouch: false, // keep native touch scrolling on mobile (prevents jank/blocked taps on fixed elements like the navbar)
     easing: (t) => 1 - Math.pow(1 - t, 3)
   });
+
   function raf(time) {
     lenis.raf(time);
     requestAnimationFrame(raf);
@@ -25,6 +42,26 @@ if (window.Lenis) {
   }
 }
 
+// ============ SINGLE, DEBOUNCED RESIZE HANDLER ============
+// FIX: previously both a `resize` listener AND a whole-`document.body`
+// ResizeObserver called lenis.resize()/ScrollTrigger.refresh(). On mobile,
+// scrolling itself changes body height (address bar collapsing), so the
+// ResizeObserver kept re-firing this in a loop -> constant layout
+// recalculation -> visible flicker/jump around the fixed navbar.
+// Now we only recalc on real resize / orientation change, debounced,
+// and we also refresh --vh so 100vh-based sections don't jump.
+let resizeTimer;
+function handleResize() {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    setVH();
+    if (lenis) lenis.resize();
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  }, 150);
+}
+window.addEventListener('resize', handleResize);
+window.addEventListener('orientationchange', handleResize);
+
 // anchor links respect lenis
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', (e) => {
@@ -35,7 +72,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
         e.preventDefault();
         if (lenis) lenis.scrollTo(target, { offset: -90 });
         else target.scrollIntoView({ behavior: 'smooth' });
-        document.getElementById('mobileDrawer').classList.remove('open');
+        closeDrawer();
       }
     }
   });
@@ -47,23 +84,34 @@ const onScroll = () => {
   if (window.scrollY > 40) nav.classList.add('scrolled');
   else nav.classList.remove('scrolled');
 };
-window.addEventListener('scroll', onScroll);
+window.addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 
 // ============ MOBILE DRAWER ============
-
 const burger = document.getElementById("burgerBtn");
 const drawer = document.getElementById("mobileDrawer");
 const drawerClose = document.getElementById("drawerCloseBtn");
+const drawerOverlay = document.getElementById("drawerOverlay");
 
-burger?.addEventListener("click", () => {
-    drawer.classList.add("open");
-    burger.setAttribute("aria-expanded", "true");
-});
+function openDrawer() {
+  drawer.classList.add("open");
+  drawerOverlay?.classList.add("open");
+  burger.setAttribute("aria-expanded", "true");
+  document.body.classList.add("drawer-open");
+}
+function closeDrawer() {
+  if (!drawer) return;
+  drawer.classList.remove("open");
+  drawerOverlay?.classList.remove("open");
+  burger?.setAttribute("aria-expanded", "false");
+  document.body.classList.remove("drawer-open");
+}
 
-drawerClose?.addEventListener("click", () => {
-    drawer.classList.remove("open");
-    burger.setAttribute("aria-expanded", "false");
+burger?.addEventListener("click", openDrawer);
+drawerClose?.addEventListener("click", closeDrawer);
+drawerOverlay?.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && drawer?.classList.contains("open")) closeDrawer();
 });
 
 // ============ SCROLL REVEAL ============
@@ -76,8 +124,13 @@ if ('IntersectionObserver' in window) {
         io.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15 });
+  }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
   revealEls.forEach(el => io.observe(el));
+
+  // safety net — force-reveal any section still hidden after 4s
+  setTimeout(() => {
+    revealEls.forEach(el => el.classList.add('in'));
+  }, 4000);
 } else {
   revealEls.forEach(el => el.classList.add('in'));
 }
@@ -151,23 +204,26 @@ if (window.gsap) {
   });
 
   gsap.to('.hero__ring', { rotate: 360, duration: 40, repeat: -1, ease: 'none' });
+
+  // Make sure ScrollTrigger measures the real, final layout once everything
+  // (fonts/images) has settled — avoids stale trigger positions on mobile.
+  window.addEventListener('load', () => ScrollTrigger.refresh());
 }
 
-// ============ CONTACT FORM (client-side only) ============
-// ============ WHATSAPP BOOKING ============
+// ============ WHATSAPP BOOKING FORM ============
 const form = document.getElementById("bookingForm");
 const note = document.getElementById("formNote");
 
 form?.addEventListener("submit", function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const name = document.getElementById("fname").value;
-    const phone = document.getElementById("fphone").value;
-    const packageName = document.getElementById("fpackage").value;
-    const mode = document.getElementById("fmode").value;
-    const message = document.getElementById("fmsg").value;
+  const name = document.getElementById("fname").value;
+  const phone = document.getElementById("fphone").value;
+  const packageName = document.getElementById("fpackage").value;
+  const mode = document.getElementById("fmode").value;
+  const message = document.getElementById("fmsg").value;
 
-    const whatsappMessage =
+  const whatsappMessage =
 `Hello RPL Diagnostic,
 
 I would like to book an appointment.
@@ -186,13 +242,13 @@ ${message}
 
 Please confirm my appointment.`;
 
-    const whatsappURL =
+  const whatsappURL =
 `https://wa.me/919811561712?text=${encodeURIComponent(whatsappMessage)}`;
 
-    window.open(whatsappURL, "_blank");
+  window.open(whatsappURL, "_blank");
 
-    note.innerHTML = "Redirecting to WhatsApp...";
-    note.style.color = "green";
+  note.innerHTML = "Redirecting to WhatsApp...";
+  note.style.color = "green";
 
-    form.reset();
+  form.reset();
 });
