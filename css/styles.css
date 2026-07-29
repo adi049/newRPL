@@ -145,29 +145,76 @@ section{ position:relative; }
   padding:18px 0;
   transition:padding .35s ease, background .35s ease, box-shadow .35s ease;
 }
+/* ============ NAVBAR CONTAINER — REDESIGNED (pill → rectangular) ============ */
+
+.nav{
+  position:fixed; top:0; left:0; right:0;
+  z-index:1000;
+  padding:16px 0; /* CHANGED: was 18px 0 — trimmed slightly since the inner bar is now much taller (88px), keeping the top/bottom framing proportional instead of oversized */
+  transition:padding .35s ease, background .35s ease, box-shadow .35s ease;
+}
+
 .nav__inner{
-  max-width:var(--container);
-  margin:0 auto;
-  padding-inline:var(--pad);
+  /* REMOVED: max-width:var(--container); margin:0 auto;
+     These centered the bar as a narrow capsule in the middle of the page. */
+  margin:0 24px; /* NEW: small left/right margins so the bar spans almost the full page width instead of being centered in a constrained container */
+
+  /* REMOVED: padding-inline:var(--pad); padding:8px 10px 8px 24px;
+     That asymmetric 8/10/8/24 padding was part of what created the capsule look. */
+  padding:0 32px; /* NEW: clean, symmetric horizontal padding — height is now controlled by min-height, not vertical padding */
+
+  min-height:88px; /* NEW: navbar height increased to ~88px (was ~50px as a pill) */
+
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:24px;
-  background:rgba(255,255,255,.6);
-  backdrop-filter:blur(18px) saturate(160%);
-  -webkit-backdrop-filter:blur(18px) saturate(160%);
-  border:1px solid rgba(255,255,255,.5);
-  border-radius:100px;
-  padding:8px 10px 8px 20px;
-  box-shadow:0 8px 30px rgba(13,34,51,.06);
-  transition:box-shadow .35s ease, background .35s ease;
+  gap:24px; /* UNCHANGED — spacing between logo/links/right side preserved */
+
+  background:rgba(255,255,255,.6); /* UNCHANGED — glass effect / colors untouched */
+  backdrop-filter:blur(18px) saturate(160%); /* UNCHANGED */
+  -webkit-backdrop-filter:blur(18px) saturate(160%); /* UNCHANGED */
+  border:1px solid rgba(255,255,255,.5); /* UNCHANGED */
+
+  border-radius:12px; /* CHANGED: was border-radius:100px (the pill/capsule shape) — now a subtle rectangular radius */
+
+  box-shadow:0 8px 30px rgba(13,34,51,.06); /* UNCHANGED */
+  transition:box-shadow .35s ease, background .35s ease; /* UNCHANGED */
 }
+
 .nav.scrolled .nav__inner{
-  background:rgba(255,255,255,.85);
-  box-shadow:0 10px 34px rgba(13,34,51,.12);
+  background:rgba(255,255,255,.85); /* UNCHANGED */
+  box-shadow:0 10px 34px rgba(13,34,51,.12); /* UNCHANGED */
 }
-.nav__logo{ display:flex; align-items:center; gap:10px; }
-.nav__logo img{ height:34px; width:auto; }
+.nav__logo{
+  display:flex;
+  align-items:center;      /* keeps it vertically centered with .nav__links automatically, since .nav__inner already uses align-items:center — no extra alignment hacks needed */
+  gap:10px;
+  margin-left:2px;         /* small extra breathing room now that padding-left grew too */
+}
+.nav__logo-crop{
+  --logo-crop-zoom: 1.18; /* TUNE THIS: raise it if the mark still looks small after cropping, lower it if edges get clipped off */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:clamp(44px, 5.8vw, 56px);
+  width:auto;
+  overflow:hidden;         /* the actual "crop" — hides transparent PNG padding */
+  transform-origin:center;
+  transition:transform .3s cubic-bezier(.2,.7,.2,1); /* smooth premium hover */
+}
+
+.nav__logo-crop img{
+  height:100%;
+  width:auto;
+  object-fit:contain;      /* preserves original aspect ratio, never stretches */
+  transform:scale(var(--logo-crop-zoom));
+  transform-origin:center;
+}
+
+/* Hover: subtle premium scale on the whole logo, Apple/Stripe-style */
+.nav__logo:hover .nav__logo-crop{
+  transform:scale(1.05);
+}
 .nav__links{ display:flex; align-items:center; gap:2px; }
 .nav__links a{
   font-size:.89rem;
